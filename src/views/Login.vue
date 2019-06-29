@@ -1,17 +1,31 @@
 <template>
-  <div class="about">
-    <div
-      v-if="!isLogin"
-      id="login">
-      <h1>ログインページ</h1>
-      <button @click="login">Googleアカウントでログイン</button>
-    </div>
-    <div
-      v-else
-      id="Home">
-      <p>ログインしました！</p>
-    </div>
-  </div>
+
+  <v-layout justify-center>
+
+    <!-- ローディング -->
+    <v-progress-circular
+      v-if="isLoading"
+      indeterminate
+      color="green">
+    </v-progress-circular>
+
+    <!-- ログイン画面 -->
+    <v-card
+      v-else>
+      <v-card-title class="font-weight-bold">Googleアカウントでログイン</v-card-title>
+      <v-card-actions>
+        <v-layout justify-center>
+          <v-btn
+            color="success"
+            @click="login">
+            ログイン
+          </v-btn>
+        </v-layout>
+      </v-card-actions>
+    </v-card>
+
+  </v-layout>
+
 </template>
 
 <script>
@@ -21,7 +35,7 @@ export default {
   name: 'app',
   data () {
     return {
-      isLogin: false
+      isLoading: false
     }
   },
   methods: {
@@ -31,13 +45,17 @@ export default {
     }
   },
   created () {
+    this.isLoading = true
     firebase.auth().getRedirectResult().then((result) => {
       console.log('result:', result)
       if (result.user) {
-        this.isLogin = true
+        this.$router.push('home')
+      } else {
+        this.isLoading = false
       }
     }).catch((error) => {
       console.log('error:', error)
+      this.isLoading = false
     })
   }
 }
